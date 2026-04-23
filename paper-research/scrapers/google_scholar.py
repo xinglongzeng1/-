@@ -8,7 +8,6 @@ class GoogleScholarScraper(BaseScraper):
     BASE_URL = "https://scholar.google.com"
 
     async def login(self) -> bool:
-        # Google Scholar 不需要登录
         return True
 
     async def search(self, keyword: str) -> list[dict]:

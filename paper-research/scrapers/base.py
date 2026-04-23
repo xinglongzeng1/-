@@ -1,8 +1,12 @@
 import asyncio
 import json
+import os
 from abc import ABC, abstractmethod
 from datetime import datetime
+from pathlib import Path
 from playwright.async_api import async_playwright, Browser, BrowserContext, Page
+
+SESSIONS_DIR = Path(__file__).parent.parent / "sessions"
 
 
 class BaseScraper(ABC):
@@ -12,11 +16,15 @@ class BaseScraper(ABC):
     def __init__(self, config: dict):
         self.config = config
         self.max_results = config.get("max_results_per_site", 50)
-        self.headless = config.get("headless", False)
-        self.slow_mo = config.get("slow_mo", 500)
+        self.headless = config.get("headless", True)
+        self.slow_mo = config.get("slow_mo", 300)
         self.browser: Browser = None
         self.context: BrowserContext = None
         self.page: Page = None
+
+    def _session_path(self) -> str | None:
+        p = SESSIONS_DIR / f"{self.name}.json"
+        return str(p) if p.exists() else None
 
     async def start(self):
         self._playwright = await async_playwright().start()
@@ -24,7 +32,8 @@ class BaseScraper(ABC):
             headless=self.headless,
             slow_mo=self.slow_mo,
         )
-        self.context = await self.browser.new_context(
+        session = self._session_path()
+        ctx_kwargs = dict(
             user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -33,6 +42,10 @@ class BaseScraper(ABC):
             viewport={"width": 1280, "height": 800},
             ignore_https_errors=True,
         )
+        if session:
+            ctx_kwargs["storage_state"] = session
+            print(f"[{self.display_name}] 已加载保存的登录状态")
+        self.context = await self.browser.new_context(**ctx_kwargs)
         self.page = await self.context.new_page()
 
     async def stop(self):

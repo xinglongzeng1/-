@@ -7,24 +7,7 @@ class VIPScraper(BaseScraper):
     BASE_URL = "https://qikan.cqvip.com"
 
     async def login(self) -> bool:
-        cfg = self.config["sites"]["vip"]
-        if not cfg.get("username") or not cfg.get("password"):
-            print(f"[{self.display_name}] 未配置账号，尝试免登录访问")
-            return True
-        try:
-            await self.page.goto(self.BASE_URL, timeout=30000)
-            await self.page.wait_for_timeout(2000)
-            login_el = self.page.locator(".login, a:has-text('登录')")
-            await login_el.first.click(timeout=5000)
-            await self.page.wait_for_timeout(1500)
-            await self.page.fill("#username, input[name='username']", cfg["username"])
-            await self.page.fill("#password, input[name='password']", cfg["password"])
-            await self.page.click(".btn-login, button[type='submit']")
-            await self.page.wait_for_timeout(3000)
-            return True
-        except Exception as e:
-            print(f"[{self.display_name}] 登录异常: {e}")
-            return True
+        return True
 
     async def search(self, keyword: str) -> list[dict]:
         papers = []

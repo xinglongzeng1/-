@@ -8,7 +8,6 @@ class ArxivScraper(BaseScraper):
     BASE_URL = "https://arxiv.org"
 
     async def login(self) -> bool:
-        # arXiv 不需要登录
         return True
 
     async def search(self, keyword: str) -> list[dict]:

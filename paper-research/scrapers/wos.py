@@ -8,33 +8,7 @@ class WOSScraper(BaseScraper):
     BASE_URL = "https://www.webofscience.com"
 
     async def login(self) -> bool:
-        cfg = self.config["sites"]["wos"]
-        try:
-            await self.page.goto(
-                f"{self.BASE_URL}/wos/woscc/basic-search", timeout=30000
-            )
-            await self.page.wait_for_timeout(3000)
-
-            # 检查是否已登录
-            if await self.page.query_selector(".search-input, #searchRules"):
-                print(f"[{self.display_name}] 已通过机构IP登录")
-                return True
-
-            # 尝试账号登录
-            if cfg.get("username") and cfg.get("password"):
-                sign_in = self.page.locator("button:has-text('Sign In'), a:has-text('Sign in')")
-                if await sign_in.count() > 0:
-                    await sign_in.first.click()
-                    await self.page.wait_for_timeout(2000)
-                    await self.page.fill("#mat-input-0, input[name='email']", cfg["username"])
-                    await self.page.fill("#mat-input-1, input[name='password']", cfg["password"])
-                    await self.page.click("button[type='submit'], .signin-btn")
-                    await self.page.wait_for_timeout(4000)
-
-            return True
-        except Exception as e:
-            print(f"[{self.display_name}] 登录异常: {e}")
-            return True
+        return True
 
     async def search(self, keyword: str) -> list[dict]:
         papers = []

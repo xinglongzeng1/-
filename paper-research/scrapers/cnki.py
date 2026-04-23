@@ -9,24 +9,8 @@ class CNKIScraper(BaseScraper):
     SEARCH_URL = "https://kns.cnki.net/kns8s/defaultresult/index"
 
     async def login(self) -> bool:
-        cfg = self.config["sites"]["cnki"]
-        if not cfg.get("username") or not cfg.get("password"):
-            print(f"[{self.display_name}] 未配置账号，尝试免登录访问")
-            return True
-        try:
-            await self.page.goto(self.BASE_URL, timeout=30000)
-            await self.page.wait_for_timeout(2000)
-            login_btn = self.page.locator("a:has-text('登录'), .login-btn, #top_login")
-            await login_btn.first.click(timeout=5000)
-            await self.page.wait_for_timeout(1500)
-            await self.page.fill("input[name='username'], #loginName", cfg["username"])
-            await self.page.fill("input[name='password'], #loginPassword", cfg["password"])
-            await self.page.click("button[type='submit'], .login-submit, #loginBtn")
-            await self.page.wait_for_timeout(3000)
-            return True
-        except Exception as e:
-            print(f"[{self.display_name}] 登录异常: {e}")
-            return True
+        # Cookie 由 login_helper.py 预先保存，start() 时已自动加载
+        return True
 
     async def search(self, keyword: str) -> list[dict]:
         papers = []
