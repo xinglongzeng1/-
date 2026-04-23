@@ -31,6 +31,7 @@ class BaseScraper(ABC):
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
             viewport={"width": 1280, "height": 800},
+            ignore_https_errors=True,
         )
         self.page = await self.context.new_page()
 

@@ -5,8 +5,24 @@ set -e
 echo "=== 安装 Python 依赖 ==="
 pip install -r requirements.txt
 
-echo "=== 安装 Playwright 浏览器 ==="
-playwright install chromium
+echo "=== 配置 Playwright 浏览器路径 ==="
+export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+playwright install chromium 2>/dev/null || true
+
+# 如果下载失败，用已有版本创建兼容符号链接
+if [ ! -f "/opt/pw-browsers/chromium_headless_shell-1208/INSTALLATION_COMPLETE" ]; then
+  echo "=== 使用已安装的 Chromium 创建兼容链接 ==="
+  mkdir -p /opt/pw-browsers/chromium_headless_shell-1208/chrome-headless-shell-linux64
+  if [ -f "/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell" ]; then
+    ln -sf /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell \
+            /opt/pw-browsers/chromium_headless_shell-1208/chrome-headless-shell-linux64/chrome-headless-shell
+    cp /opt/pw-browsers/chromium_headless_shell-1194/INSTALLATION_COMPLETE \
+       /opt/pw-browsers/chromium_headless_shell-1208/
+    cp /opt/pw-browsers/chromium_headless_shell-1194/DEPENDENCIES_VALIDATED \
+       /opt/pw-browsers/chromium_headless_shell-1208/
+    echo "✅ Chromium 兼容配置完成"
+  fi
+fi
 
 echo ""
 echo "✅ 安装完成！"

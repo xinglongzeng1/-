@@ -4,6 +4,9 @@
 用法: python main.py --keywords "设计哲学" "历史学" --sites cnki wanfang arxiv
 """
 
+import os
+os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", "/opt/pw-browsers")
+
 import asyncio
 import argparse
 import json
