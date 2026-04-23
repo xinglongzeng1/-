@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论文调研报告 — 本雅明, Walter Benjamin time, Walter Benjamin community, Walter Benjamin politics, Walter Benjamin epistemology</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+          background: #f5f5f5; color: #333; }
+
+  /* 顶部栏 */
+  header { background: #1a237e; color: #fff; padding: 18px 28px; display: flex;
+            align-items: center; justify-content: space-between; position: sticky;
+            top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  header h1 { font-size: 1.3rem; font-weight: 600; }
+  header .meta { font-size: .85rem; opacity: .8; }
+
+  /* 主布局 */
+  .container { display: flex; min-height: calc(100vh - 62px); }
+
+  /* 侧边栏 */
+  .sidebar { width: 260px; background: #fff; border-right: 1px solid #e0e0e0;
+              padding: 20px 16px; flex-shrink: 0; position: sticky; top: 62px;
+              height: calc(100vh - 62px); overflow-y: auto; }
+  .sidebar h3 { font-size: .8rem; text-transform: uppercase; color: #888;
+                 letter-spacing: .06em; margin-bottom: 10px; }
+  .sidebar section { margin-bottom: 24px; }
+
+  .filter-group label { display: flex; align-items: center; gap: 8px; padding: 5px 0;
+                          cursor: pointer; font-size: .9rem; }
+  .filter-group label:hover { color: #1a237e; }
+  .filter-group input[type=checkbox] { accent-color: #1a237e; width: 15px; height: 15px; }
+
+  .badge-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+
+  .stats-box { background: #f8f9fa; border-radius: 8px; padding: 14px;
+                font-size: .88rem; }
+  .stats-box .stat { display: flex; justify-content: space-between; padding: 3px 0; }
+  .stats-box .stat-val { font-weight: 600; color: #1a237e; }
+
+  /* 主内容 */
+  .main { flex: 1; padding: 20px 24px; min-width: 0; }
+
+  /* 搜索 + 排序 */
+  .toolbar { display: flex; gap: 12px; margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+  .search-box { flex: 1; min-width: 200px; position: relative; }
+  .search-box input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid #ddd;
+                        border-radius: 8px; font-size: .95rem; outline: none; }
+  .search-box input:focus { border-color: #1a237e; box-shadow: 0 0 0 2px rgba(26,35,126,.15); }
+  .search-box::before { content: '🔍'; position: absolute; left: 12px; top: 50%;
+                          transform: translateY(-50%); font-size: .9rem; }
+  select { padding: 9px 14px; border: 1px solid #ddd; border-radius: 8px;
+             font-size: .9rem; background: #fff; cursor: pointer; outline: none; }
+
+  .result-count { font-size: .88rem; color: #666; white-space: nowrap; }
+
+  /* 论文卡片 */
+  .papers-grid { display: flex; flex-direction: column; gap: 14px; }
+
+  .paper-card { background: #fff; border-radius: 10px; padding: 18px 20px;
+                  box-shadow: 0 1px 4px rgba(0,0,0,.08); border-left: 4px solid #ccc;
+                  transition: box-shadow .2s, transform .1s; cursor: default; }
+  .paper-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.14); transform: translateY(-1px); }
+
+  .paper-header { display: flex; justify-content: space-between; align-items: flex-start;
+                   gap: 12px; margin-bottom: 8px; }
+  .paper-title { font-size: 1rem; font-weight: 600; color: #1a1a1a; line-height: 1.4; flex: 1; }
+  .paper-title a { color: inherit; text-decoration: none; }
+  .paper-title a:hover { color: #1a237e; text-decoration: underline; }
+
+  .source-badge { font-size: .72rem; font-weight: 600; padding: 3px 10px;
+                   border-radius: 12px; color: #fff; white-space: nowrap; flex-shrink: 0; }
+
+  .paper-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: .83rem;
+                 color: #666; margin-bottom: 10px; }
+  .paper-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .paper-abstract { font-size: .87rem; color: #555; line-height: 1.6;
+                     max-height: 72px; overflow: hidden; position: relative;
+                     transition: max-height .3s ease; }
+  .paper-abstract.expanded { max-height: 600px; }
+  .paper-abstract::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+                             height: 24px; background: linear-gradient(transparent, #fff);
+                             pointer-events: none; transition: opacity .3s; }
+  .paper-abstract.expanded::after { opacity: 0; }
+
+  .paper-footer { margin-top: 10px; display: flex; gap: 10px; align-items: center;
+                   flex-wrap: wrap; }
+  .tag { font-size: .75rem; background: #eef2ff; color: #3949ab; padding: 2px 9px;
+          border-radius: 10px; }
+  .expand-btn { font-size: .78rem; color: #1a237e; cursor: pointer; background: none;
+                 border: none; padding: 0; text-decoration: underline; }
+  .open-link { font-size: .78rem; color: #fff; background: #1a237e; padding: 4px 12px;
+                border-radius: 6px; text-decoration: none; margin-left: auto; }
+  .open-link:hover { background: #283593; }
+
+  /* 空状态 */
+  .empty-state { text-align: center; padding: 60px 20px; color: #999; }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 14px; }
+  }
+
+  /* 打印 */
+  @media print {
+    .sidebar, .toolbar { display: none; }
+    .paper-abstract { max-height: none; }
+    .paper-abstract::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📚 论文调研报告 &nbsp;·&nbsp; 本雅明, Walter Benjamin time, Walter Benjamin community, Walter Benjamin politics, Walter Benjamin epistemology</h1>
+  <div class="meta">共 0 篇 &nbsp;|&nbsp; 生成于 2026-04-23 07:04:08</div>
+</header>
+
+<div class="container">
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <section>
+      <h3>统计</h3>
+      <div class="stats-box" id="statsBox"></div>
+    </section>
+
+    <section>
+      <h3>数据来源</h3>
+      <div class="filter-group" id="sourceFilters"></div>
+    </section>
+
+    <section>
+      <h3>发表年份</h3>
+      <div class="filter-group" id="yearFilters"></div>
+    </section>
+
+    <section>
+      <h3>搜索关键词</h3>
+      <div class="filter-group" id="kwFilters"></div>
+    </section>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main">
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="在结果中搜索标题、作者、摘要…">
+      </div>
+      <select id="sortSelect">
+        <option value="default">默认排序</option>
+        <option value="year_desc">年份 (新→旧)</option>
+        <option value="year_asc">年份 (旧→新)</option>
+        <option value="citations">引用次数</option>
+        <option value="title">标题字母序</option>
+      </select>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+
+    <div class="papers-grid" id="papersGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="icon">🔍</div>
+      <div>没有符合条件的论文</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const PAPERS = [];
+
+const SOURCE_COLORS = {
+  cnki:           { bg: "#e8f4fd", badge: "#1565c0", label: "知网 CNKI" },
+  wanfang:        { bg: "#e8f5e9", badge: "#2e7d32", label: "万方数据" },
+  vip:            { bg: "#fff3e0", badge: "#e65100", label: "维普期刊" },
+  google_scholar: { bg: "#fce4ec", badge: "#880e4f", label: "Google Scholar" },
+  arxiv:          { bg: "#f3e5f5", badge: "#6a1b9a", label: "arXiv" },
+  wos:            { bg: "#e0f2f1", badge: "#00695c", label: "Web of Science" },
+};
+
+// 状态
+let activeSourceFilters = new Set();
+let activeYearFilters = new Set();
+let activeKwFilters = new Set();
+let searchQuery = "";
+let sortMode = "default";
+
+// 初始化过滤器
+function initFilters() {
+  const sources = [...new Set(PAPERS.map(p => p.source_key))];
+  const years = [...new Set(PAPERS.map(p => p.year).filter(Boolean))].sort((a,b) => b-a);
+  const kws = [...new Set(PAPERS.map(p => p.search_keyword).filter(Boolean))];
+
+  sources.forEach(s => activeSourceFilters.add(s));
+  years.forEach(y => activeYearFilters.add(y));
+  kws.forEach(k => activeKwFilters.add(k));
+
+  // 来源
+  const sf = document.getElementById('sourceFilters');
+  sources.forEach(s => {
+    const c = SOURCE_COLORS[s] || { badge: "#666", label: s };
+    sf.innerHTML += `<label>
+      <input type="checkbox" checked data-type="source" data-val="${s}">
+      <span class="badge-dot" style="background:${c.badge}"></span>
+      ${c.label}
+    </label>`;
+  });
+
+  // 年份
+  const yf = document.getElementById('yearFilters');
+  years.slice(0, 20).forEach(y => {
+    yf.innerHTML += `<label>
+      <input type="checkbox" checked data-type="year" data-val="${y}">
+      ${y}
+    </label>`;
+  });
+
+  // 关键词
+  const kf = document.getElementById('kwFilters');
+  kws.forEach(k => {
+    kf.innerHTML += `<label>
+      <input type="checkbox" checked data-type="kw" data-val="${k}">
+      ${k}
+    </label>`;
+  });
+
+  // 绑定事件
+  document.querySelectorAll('.filter-group input').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const type = cb.dataset.type, val = cb.dataset.val;
+      if (type === 'source') cb.checked ? activeSourceFilters.add(val) : activeSourceFilters.delete(val);
+      if (type === 'year')   cb.checked ? activeYearFilters.add(val)   : activeYearFilters.delete(val);
+      if (type === 'kw')     cb.checked ? activeKwFilters.add(val)     : activeKwFilters.delete(val);
+      render();
+    });
+  });
+}
+
+// 过滤 + 排序
+function getFiltered() {
+  let list = PAPERS.filter(p => {
+    if (!activeSourceFilters.has(p.source_key)) return false;
+    if (p.year && !activeYearFilters.has(p.year)) return false;
+    if (p.search_keyword && !activeKwFilters.has(p.search_keyword)) return false;
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const haystack = (p.title + p.authors + p.abstract + p.journal).toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  });
+
+  if (sortMode === 'year_desc') list.sort((a,b) => (b.year||'0').localeCompare(a.year||'0'));
+  if (sortMode === 'year_asc')  list.sort((a,b) => (a.year||'0').localeCompare(b.year||'0'));
+  if (sortMode === 'citations') list.sort((a,b) => (parseInt(b.citations)||0) - (parseInt(a.citations)||0));
+  if (sortMode === 'title')     list.sort((a,b) => a.title.localeCompare(b.title));
+
+  return list;
+}
+
+function highlight(text, q) {
+  if (!q || !text) return text || '';
+  const esc = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(`(${esc})`, 'gi'), '<mark style="background:#fff176;padding:0 2px;border-radius:2px">$1</mark>');
+}
+
+function renderCard(p) {
+  const c = SOURCE_COLORS[p.source_key] || { bg:'#f5f5f5', badge:'#666', label: p.source };
+  const q = searchQuery;
+  const titleHtml = p.url
+    ? `<a href="${p.url}" target="_blank">${highlight(p.title, q)}</a>`
+    : highlight(p.title, q);
+
+  const metaParts = [];
+  if (p.authors) metaParts.push(`<span>👤 ${highlight(p.authors.substring(0,80), q)}${p.authors.length>80?'…':''}</span>`);
+  if (p.journal) metaParts.push(`<span>📰 ${highlight(p.journal.substring(0,60), q)}</span>`);
+  if (p.year)    metaParts.push(`<span>📅 ${p.year}</span>`);
+  if (p.citations) metaParts.push(`<span>🔁 被引 ${p.citations}</span>`);
+  if (p.doi)     metaParts.push(`<span>DOI: ${p.doi.replace('https://doi.org/','').substring(0,30)}</span>`);
+
+  const abs = p.abstract ? highlight(p.abstract, q) : '';
+  const absSection = abs ? `
+    <div class="paper-abstract" id="abs_${p._idx}">
+      ${abs}
+    </div>` : '';
+  const expandBtn = abs ? `<button class="expand-btn" onclick="toggleAbs('abs_${p._idx}', this)">展开摘要</button>` : '';
+
+  const openLink = p.url ? `<a href="${p.url}" target="_blank" class="open-link">打开原文 →</a>` : '';
+
+  return `<div class="paper-card" style="border-left-color:${c.badge};background:${c.bg}">
+    <div class="paper-header">
+      <div class="paper-title">${titleHtml}</div>
+      <span class="source-badge" style="background:${c.badge}">${c.label}</span>
+    </div>
+    <div class="paper-meta">${metaParts.join('')}</div>
+    ${absSection}
+    <div class="paper-footer">
+      <span class="tag">${p.search_keyword}</span>
+      ${expandBtn}
+      ${openLink}
+    </div>
+  </div>`;
+}
+
+function toggleAbs(id, btn) {
+  const el = document.getElementById(id);
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? '收起摘要' : '展开摘要';
+}
+
+function updateStats(list) {
+  const bySource = {};
+  list.forEach(p => { bySource[p.source_key] = (bySource[p.source_key]||0)+1; });
+  const rows = Object.entries(bySource).map(([k,v]) => {
+    const c = SOURCE_COLORS[k] || { label: k };
+    return `<div class="stat"><span>${c.label}</span><span class="stat-val">${v}</span></div>`;
+  }).join('');
+  document.getElementById('statsBox').innerHTML = `
+    <div class="stat" style="margin-bottom:6px;font-weight:600">
+      <span>总计</span><span class="stat-val">${list.length}</span>
+    </div>
+    ${rows}`;
+}
+
+function render() {
+  const list = getFiltered();
+  list.forEach((p, i) => p._idx = i);
+  const grid = document.getElementById('papersGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = `显示 ${list.length} 篇`;
+
+  if (list.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    grid.innerHTML = list.map(renderCard).join('');
+    empty.style.display = 'none';
+  }
+  updateStats(list);
+}
+
+// 事件绑定
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  render();
+});
+document.getElementById('sortSelect').addEventListener('change', e => {
+  sortMode = e.target.value;
+  render();
+});
+
+initFilters();
+render();
+</script>
+</body>
+</html>

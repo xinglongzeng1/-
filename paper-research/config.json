@@ -29,6 +29,6 @@
       "password": ""
     }
   },
-  "headless": false,
-  "slow_mo": 500
+  "headless": true,
+  "slow_mo": 300
 }
